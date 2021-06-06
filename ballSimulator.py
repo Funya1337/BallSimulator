@@ -33,7 +33,7 @@ def checkForBounce(ball):
 def ballGravity(ball, wn, gravity):
   while True:
     wn.update()
-
+    
     ball.turtleClassBall.dy -= gravity
     ball.turtleClassBall.sety(ball.turtleClassBall.ycor() + ball.turtleClassBall.dy)
 
@@ -45,24 +45,13 @@ def ballGravity(ball, wn, gravity):
 
 def main():
   wn = turtle.Screen()
-  wn.bgcolor("black")
+  wn.bgcolor("white")
   wn.title("Bouncing Ball Simulator")
   wn.setup(650, 650)
   gravity = 0.1
 
-  balls = []
-
-  #for _ in range(10):
-  #  balls.append(Ball(turtle.Turtle(), "green", 2, 0, random.randint(-290, 290)))
-
-  #for i in range(len(balls)):
-  #  balls[i].createBall()
-
-  ball = Ball(turtle.Turtle(), "green", 2, 0, random.randint(-290, 290))
+  ball = Ball(turtle.Turtle(), "green", 2, 0, 0)
   ball.createBall()
-
-  #for i in range(len(balls)):
-  #  ballGravity(balls[i], wn, gravity)
 
   ballGravity(ball, wn, gravity)
   
