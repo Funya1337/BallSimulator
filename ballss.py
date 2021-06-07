@@ -3,20 +3,55 @@ from tkinter import *
 import sys
 import os
 import time
+import random
+from time import strftime
 
 WIDTH = 800
 HEIGHT = 600
 r = 200
 showPathChecker = False
+old_coord_x = 0
+old_coord_y = 0
+hours = 0
+minutes = 0
+seconds = 0
+
+class Clock:
+  def __init__(self, tk):
+    self.tk = tk
+    self.lbl = 0
+
+  def updateClock(self, pos):
+    global seconds
+    global minutes
+    global hours
+    if pos != 602:
+      seconds += 1
+      if seconds >= 60:
+        minutes += 1
+        seconds = 0
+      if minutes >= 60:
+        hours += 1
+        minutes = 0
+      now = str(hours) + ":" + str(minutes) + ":" + str(seconds)
+      self.lbl.configure(text=now)
+
+  def initializeClock(self):
+    lbl = Label(self.tk, font = ('calibri', 40, 'bold'), foreground = 'red')
+    lbl.place(x = 450, y = 60)
+    self.lbl = lbl
+    lbl.configure(text = "00:00:00")
 
 class Ball:
-  def __init__(self, canvas, radius, color):
+  def __init__(self, canvas, radius, x1, x2, color):
     self.canvas = canvas
     self.radius = radius
     self.color = color
+    self.x1 = x1
+    self.x2 = x2
 
   def create_ball(self):
-    return canvas.create_oval(self.radius, self.radius, 150, 150, fill = self.color, tag = "ball")
+    return canvas.create_oval(self.radius, self.radius, self.x1, self.x2, fill = self.color, tag = "ball")
 
 def pushEvent():
   dx = w2.get()
@@ -42,7 +77,6 @@ def drawPath(pos):
 
 def showPathCheckerFunc():
   global showPathChecker
-  print(showPathChecker)
   if showPathBtn['text'] == 'True':
     showPathBtn['text'] = 'False'
     showPathChecker = False
@@ -59,6 +93,8 @@ def ballGravity(dx, dy):
     pos = canvas.coords(ball)
 
     showCoords(pos)
+
+    watch.updateClock(pos[3])
 
     if showPathChecker:
       drawPath(pos)
@@ -84,10 +120,18 @@ def ballGravity(dx, dy):
     time.sleep(0.025)
      
 def onLeftDrag(event):
-  print(canvas.coords(ball))
-  print('Widget=%s X=%s Y=%s' % (event.widget, event.x, event.y))
+  global old_coord_x
+  global old_coord_y
+  delta_x = event.x - old_coord_x
+  delta_y = event.y - old_coord_y
+  pos = canvas.coords(ball)
+  canvas.move(ball, delta_x, delta_y)
+  old_coord_x = event.x
+  old_coord_y = event.y
 
 tk = tkr.Tk()
+tk.resizable(False, False)
+tk.title("Ball simulator")
 canvas = tkr.Canvas(tk, width = WIDTH, height = HEIGHT, bg = "white")
 canvas.grid()
 
@@ -103,8 +147,19 @@ label_y1 = Label(tk, text= "Ball Coord y1: " + "0")
 label_x1.place(x = 560, y = 10)
 label_y1.place(x = 560, y = 30)
 
-ballExample = Ball(canvas, r, "red")
+watch = Clock(tk)
+watch.initializeClock()
+
+ballExample = Ball(canvas, r, 150, 150, "red")
 ball = ballExample.create_ball()
+
+#targetBall = Ball(canvas, r, 150, 150, "green")
+#tb = targetBall.create_ball()
+
+#ball1 = canvas.create_oval(canvas, 80, 150, 150, fill = "green")
+
+old_coord_x = canvas.coords(ball)[0]
+old_coord_y = canvas.coords(ball)[1]
 
 pushBtn = Button(tk, text='PUSH!', width=10,
              height=3, command=pushEvent)
